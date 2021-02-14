@@ -11,7 +11,9 @@ export default class AVLTree extends BinarySearchTree {
   }
 
   balance(node) {
+    // console.log("balance", node.value, node.left.value, node.left.balanceFactor, node.parent.value)
     if (node.balanceFactor >= 2) {
+      // console.log("bf >=2", node.value, node.left.value, node.left.balanceFactor, node.parent.value)
       if (node.left.balanceFactor <= -1) {
         let leftNode = node.left;
         let leftRightNode = node.left.right;
@@ -39,21 +41,30 @@ export default class AVLTree extends BinarySearchTree {
       }
 
       const leftNode = node.left;
+      // separate nodes
       node.left = null;
+      leftNode.parent = null;
+
+      // rotate
       if (node.parent) {
-        leftNode.parent = node.parent;
         node.parent.left = leftNode;
+        leftNode.parent = node.parent;
       } else {
         this.root = leftNode;
       }
+
       if (!leftNode.right) {
         leftNode.right = node;
+        node.parent = leftNode;
       } else {
         node.left = leftNode.right;
         leftNode.right.parent = node;
         leftNode.right = node;
+        node.parent = leftNode;
       }
     } else if (node.balanceFactor <= -2) {
+      // console.log("bf <= -2", node.value, node.right.value, node.left)
+
       if (node.right.balanceFactor >= 1) {
         let rightNode = node.right;
         let rightLeftNode = node.right.left;
@@ -80,20 +91,33 @@ export default class AVLTree extends BinarySearchTree {
       }
 
       const rightNode = node.right;
+
+      // separate;
       node.right = null;
+      rightNode.parent = null;
+
+      // rotate;
       if (node.parent) {
         node.parent.right = rightNode;
         rightNode.parent = node.parent;
       } else {
         this.root = rightNode;
       }
+
       if (!rightNode.left) {
         rightNode.left = node;
+        node.parent = rightNode;
       } else {
         node.right = rightNode.left;
         rightNode.left.parent = node;
         rightNode.left = node;
+        node.parent = rightNode;
       }
     }
+  }
+
+  remove(value) {
+    super.remove(value);
+    this.balance(this.root);
   }
 }
